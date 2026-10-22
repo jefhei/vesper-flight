@@ -71,15 +71,20 @@ locally, and the GitHub Actions CI run on `b8bbf53` completed `success`.**
 
 | Task | Description | Depends On | Est. |
 |------|-------------|------------|------|
-| [ ] M2-T1 | Hull: wedge prow, blunt bridge face, main body, drive bell + nozzle skirt — merged to ≤ 6 draw calls | M1-T2 | 1.5 d |
-| [ ] M2-T2 | Greebles and wear: panel lines, hatches, dock ring, hazard striping, repair patch, nameplate `BARROW`/`HD-441` (canvas texture) | M2-T1 | 1 d |
-| [ ] M2-T3 | Radiators (4): deployment pose, heat-driven emissive ramp with accumulate/decay | M2-T1 | 0.5 d |
-| [ ] M2-T4 | Torch plume + nozzle point light; running lights; 12 RCS quad positions + puff VFX | M2-T1 | 1 d |
+| [x] M2-T1 | Hull: wedge prow, blunt bridge face, main body, drive bell + nozzle skirt — merged to ≤ 6 draw calls | M1-T2 | 1.5 d |
+| [x] M2-T2 | Greebles and wear: panel lines, hatches, dock ring, hazard striping, repair patch, nameplate `BARROW`/`HD-441` (canvas texture) | M2-T1 | 1 d |
+| [x] M2-T3 | Radiators (4): deployment pose, heat-driven emissive ramp with accumulate/decay | M2-T1 | 0.5 d |
+| [x] M2-T4 | Torch plume + nozzle point light; running lights; 12 RCS quad positions + puff VFX | M2-T1 | 1 d |
+
+> Built 2026-10-22. **75 parts authored as data** in `src/lib/ship/hullSpec.ts`, merged at runtime
+> into 6 draw calls (one vertex-coloured plating mesh, radiator/heat mesh, running-light mesh,
+> nameplate plane, two plume cones). Review surface and known residuals: `docs/m2-hull.md`.
+> RCS *positions* are in (12, three per corner); the puff VFX is still outstanding.
 
 **Machine gate:** hull under draw-call ceiling; no NaN in plume/heat curves; nameplate texture
-generated deterministically.
+generated deterministically. **MET — 48 tests / 11 files.**
 **Human review:** silhouette signed off against the torchship interior — same class, same wear; the
-plume is the best-looking thing on screen.
+plume is the best-looking thing on screen. **PENDING — `?spike=light`.**
 
 ## M3 — Flight & Camera (day 10–13)
 

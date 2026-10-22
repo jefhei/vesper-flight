@@ -18,7 +18,7 @@ import type { SystemSpec } from '../types/world'
 import { Planet, Star } from './Bodies'
 import { Panel, fmt } from './Panel'
 import { axis, useKeys } from './useKeys'
-import { WhiteBoxShip } from './WhiteBoxShip'
+import { BarrowHull } from '../scene/ship/BarrowHull'
 
 type Hud = {
   speed: number
@@ -163,7 +163,7 @@ function FlightLoop({ system, onHud }: { system: SystemSpec; onHud: (hud: Hud) =
       <Star radiusM={45_000_000} positionM={[0, 0, 0]} />
       <Planet body={planet} level={2} positionM={planetRenderM} mapWidth={1024} />
       <group ref={shipGroup}>
-        <WhiteBoxShip throttleRef={throttleRef as RefObject<number>} heat={0.5} />
+        <BarrowHull throttleRef={throttleRef as RefObject<number>} />
       </group>
     </>
   )
