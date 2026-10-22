@@ -24,26 +24,38 @@ import {
   type HullPart,
   type PartGroup,
 } from '../../lib/ship/hullSpec'
-import { wedgeGeometry } from '../../lib/ship/primitives'
+import { octagonProfile, prismGeometry, wedgeGeometry } from '../../lib/ship/primitives'
 import type { ShipState } from '../../types/flight'
 
 /** Draw calls this hull costs: hull merge, radiators, lights, nameplate, two
  *  plume cones. PRD §10 allows ≤ 6 for the whole ship. */
 export const HULL_DRAW_CALLS = 6
 
+function primitiveToGeometry(mesh: {
+  positions: Float32Array
+  normals: Float32Array
+  uvs: Float32Array
+  triangleCount: number
+}): BufferGeometry {
+  const geom = new BufferGeometry()
+  geom.setAttribute('position', new BufferAttribute(mesh.positions, 3))
+  geom.setAttribute('normal', new BufferAttribute(mesh.normals, 3))
+  geom.setAttribute('uv', new BufferAttribute(mesh.uvs, 2))
+  return geom
+}
+
 function baseGeometry(part: HullPart): BufferGeometry {
   if (part.kind === 'wedge') {
     const [widthFront, heightFront] = part.taperFront ?? [part.size[0], part.size[1]]
-    const mesh = wedgeGeometry(part.size[2], widthFront, heightFront, part.size[0], part.size[1])
-    const geom = new BufferGeometry()
-    geom.setAttribute('position', new BufferAttribute(mesh.positions, 3))
-    geom.setAttribute('uv', new BufferAttribute(mesh.uvs, 2))
-    geom.setIndex(
-      Array.from({ length: mesh.triangleCount * 3 }, (_, i) => i),
+    return primitiveToGeometry(
+      wedgeGeometry(part.size[2], widthFront, heightFront, part.size[0], part.size[1]),
     )
-    const indexed = geom.toNonIndexed()
-    geom.dispose()
-    return indexed
+  }
+  if (part.kind === 'prism') {
+    const profile = part.profile ?? octagonProfile(part.size[0], part.size[1])
+    return primitiveToGeometry(
+      prismGeometry(profile, part.size[2], part.frontScale ?? 1, part.backScale ?? 1),
+    )
   }
   if (part.kind === 'cylinder') {
     const radiusBottom = part.size[0]
@@ -250,18 +262,18 @@ function TorchPlume({ throttle, throttleRef }: { throttle: number; throttleRef?:
   return (
     <group ref={group} position={[0, 0, HULL_LANDMARKS.plumeExitZ + 13]}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[4.6, 26, 24, 1, true]} />
+        <coneGeometry args={[3.1, 22, 24, 1, true]} />
         <meshBasicMaterial
           color="#ff9a45"
           transparent
-          opacity={0.42}
+          opacity={0.34}
           depthWrite={false}
           side={DoubleSide}
           blending={2}
         />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[1.9, 15, 18, 1, true]} />
+        <coneGeometry args={[1.3, 13, 18, 1, true]} />
         <meshBasicMaterial
           color="#ffe6a8"
           transparent

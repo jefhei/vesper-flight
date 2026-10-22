@@ -17,19 +17,25 @@ Keys: `←/→` star azimuth, `↑/↓` plume throttle, `[` `]` zoom (45–170 m
 
 ## What is built
 
-- **75 parts**, authored as data in `src/lib/ship/hullSpec.ts` — not a GLTF. The spec is the
+- **137 parts**, authored as data in `src/lib/ship/hullSpec.ts` — not a GLTF. The spec is the
   source of truth; the mesh is generated from it, so the parts list, the landmarks and the tests
   cannot drift apart.
+- **Extruded octagonal profiles, not boxes.** `prismGeometry(profile, length, frontScale,
+  backScale)` extrudes a chamfered cross-section; the hull meets its faces at a bevel, which is
+  what gives the silhouette edges instead of corners. The nose is a three-segment taper (tip →
+  shoulder → body) with a raised bridge cap, not one slab.
 - **Merged to 6 draw calls** (budget 6): one vertex-coloured plating mesh, one radiator/heat mesh,
   one vertex-coloured running-light mesh, the nameplate plane, two plume cones.
-- **Silhouette:** tapered prow wedge (6.2 m face expanding to 12 m) → bridge block with a slanted
-  visor and a dark viewport band → 14 × 10 m main body → aft taper → drive collar → open drive bell
-  → nozzle lip. Dorsal spine with two cargo hatches and the nameplate; keel fin aft; two dorsal
-  tanks; four deployed radiator panels on booms; twelve RCS quads, three per corner.
-- **Wear pass:** navy panel bands, five seam lines per flank and dorsal, one mismatched repair
-  patch per side, hazard striping on the prow, black service vents, two conduits down the spine.
-- **Nameplate:** 1024×210 canvas texture, `BARROW` + `HD-441`, grime streaks, on a dark backing
-  plate on the spine. Deterministic — no external asset.
+- **Radiators are arrays, not blades.** Each of the four wings is a broad plate split into three
+  segments along the ship axis with two frame ribs, a header pipe at the inboard edge and a tip
+  rail outboard, standing off the hull on a boom and canted 17°.
+- **Silhouette:** tapered prow (three segments) → bridge cap with slanted visor and viewport band
+  → 14 × 10 m octagonal body → aft taper → drive collar → ribbed open bell → nozzle lip. Dorsal
+  spine, two cargo hatches, nameplate, keel fin, two dorsal tanks, service housings, masts, sensor
+  domes, a winch and a crane arm. Twelve RCS quads, three per corner, four with modelled nozzles.
+- **Wear pass:** navy panel bands, five seam lines per flank and dorsal, mismatched repair patches,
+  hazard striping on the nose, black service vents, three conduit runs.
+- **Nameplate:** 1024×210 canvas texture, `BARROW` + `HD-441`, grime streaks, framed on the spine.
 - **Radiators:** dull maroon at 35% throttle, heat accumulates on thrust and decays when coasting
   (`emissiveIntensity = 0.01 + heat × 0.16`), and the nozzle throat rides the same material so the
   drive glows with them.
@@ -45,8 +51,12 @@ Keys: `←/→` star azimuth, `↑/↓` plume throttle, `[` `]` zoom (45–170 m
   pass used a warm key at 3.2 and turned the whole ship cardboard-brown.
 - **The bell is open-ended.** A capped cylinder read as a black disc from astern; the open bell
   plus a dark throat reads as a nozzle.
-- **Plume cone is a focused jet, not a wide flame** — apex aft, base at the nozzle lip. It reads
-  more "torch drive" than "rocket", which is the ship.
+- **Wings are segmented ALONG the ship, not across the wing.** The first attempt put three panels
+  side by side across a 4.5 m span and produced a stack of blades; a 1.45 m panel with a 10 m
+  length is a blade no matter how it is coloured.
+- **A wing face-on will always hide part of the hull.** At full span it read as a cargo door over
+  the flank; the wings are now 3.2 m tall, 8.4 m long, canted 17° and mounted aft, so they read as
+  fins and the hull still shows between them.
 
 ## Not done yet (M2 residuals)
 

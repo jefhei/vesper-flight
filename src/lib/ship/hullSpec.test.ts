@@ -19,47 +19,58 @@ describe('Hound-class hull spec', () => {
     const mainBody = HULL_PARTS.find((p) => p.id === 'main-body')!
     expect(mainBody.size[0]).toBe(HULL_BEAM_M)
     expect(primary.size[0]).toBeGreaterThan(HULL_BEAM_M)
-    expect(bounds.size[0]).toBeGreaterThan(HULL_BEAM_M + 10)
+    // Deployed wings stand off the flanks: ~18.6 m across, 14.4 m tall.
+    expect(bounds.size[0]).toBeGreaterThan(HULL_BEAM_M + 3)
     // Nose at -Z, drive at +Z.
     expect(bounds.min[2]).toBeLessThan(-21)
     expect(bounds.max[2]).toBeGreaterThan(21)
   })
 
-  it('has one hull merge, four radiator panels and seven running lights', () => {
+  it('has one hull merge, twelve radiator panels and seven running lights', () => {
     const counts = partCountByGroup()
-    // Four panels plus the nozzle throat, which rides the same heat material.
-    const panels = HULL_PARTS.filter((p) => p.id.startsWith('rad-'))
-    expect(panels).toHaveLength(4)
-    expect(counts.radiator).toBe(5)
+    // Four wings × three panels; the nozzle throat rides the same heat material.
+    expect(HULL_LANDMARKS.radiatorPanels).toHaveLength(12)
+    expect(counts.radiator).toBe(13)
     expect(counts.light).toBe(7)
-    expect(counts.hull).toBeGreaterThan(25)
+    expect(counts.hull).toBeGreaterThan(60)
   })
 
-  it('mirrors the radiator panels port/starboard and dorsal/ventral', () => {
+  it('gives every radiator wing three panels and a tip rail', () => {
+    for (const wing of HULL_LANDMARKS.wingIds) {
+      const panels = HULL_PARTS.filter((p) => p.id.startsWith(`rad-${wing}-`))
+      expect(panels).toHaveLength(3)
+      expect(panels.every((p) => p.group === 'radiator')).toBe(true)
+      expect(HULL_PARTS.some((p) => p.id === `radrail-${wing}`)).toBe(true)
+      expect(HULL_PARTS.some((p) => p.id === `radhdr-${wing}`)).toBe(true)
+    }
+  })
+
+  it('mirrors the radiator wings port/starboard and dorsal/ventral', () => {
     const byId = new Map(HULL_PARTS.map((p) => [p.id, p]))
-    const pairs: Array<[string, string]> = [
-      ['rad-port', 'rad-stbd'],
-      ['rad-dorsal', 'rad-ventral'],
-    ]
-    for (const [a, b] of pairs) {
-      const pa = byId.get(a)!
-      const pb = byId.get(b)!
-      expect(pa.group).toBe('radiator')
-      expect(pb.group).toBe('radiator')
-      // Mirrored across the matching axis, same z.
-      const axisSum = Math.abs(pa.pos[0] + pb.pos[0]) + Math.abs(pa.pos[1] + pb.pos[1])
-      expect(axisSum).toBeLessThan(0.001)
-      expect(Math.abs(pa.pos[2] - pb.pos[2])).toBeLessThan(0.001)
+    for (const i of [0, 1, 2]) {
+      const port = byId.get(`rad-port-${i}`)!
+      const stbd = byId.get(`rad-stbd-${i}`)!
+      expect(port.pos[0] + stbd.pos[0]).toBeCloseTo(0, 6)
+      expect(port.pos[2]).toBeCloseTo(stbd.pos[2], 6)
+
+      const dorsal = byId.get(`rad-dorsal-${i}`)!
+      const ventral = byId.get(`rad-ventral-${i}`)!
+      expect(dorsal.pos[1] + ventral.pos[1]).toBeCloseTo(0, 6)
+      expect(dorsal.pos[2]).toBeCloseTo(ventral.pos[2], 6)
     }
   })
 
   it('carries twelve RCS thrusters, three per corner', () => {
-    const rcs = HULL_PARTS.filter((p) => p.id.startsWith('rcs-'))
-    expect(rcs).toHaveLength(12)
+    const bodies = HULL_PARTS.filter(
+      (p) => p.id.startsWith('rcs-') && /-(x|y|z)$/.test(p.id),
+    )
+    expect(bodies).toHaveLength(12)
     for (const corner of [0, 1, 2, 3]) {
-      const set = rcs.filter((p) => p.id.startsWith(`rcs-${corner}-`))
+      const set = bodies.filter((p) => p.id.startsWith(`rcs-${corner}-`))
       expect(set.map((p) => p.id.split('-').pop()).sort()).toEqual(['x', 'y', 'z'])
     }
+    // Four of the twelve carry modelled exhaust nozzles.
+    expect(HULL_PARTS.filter((p) => p.id.endsWith('-nozzle'))).toHaveLength(8)
   })
 
   it('puts the nameplate on the dorsal spine, inside the hull footprint', () => {

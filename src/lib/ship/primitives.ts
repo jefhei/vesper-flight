@@ -117,3 +117,89 @@ export function outwardFraction(mesh: PrimitiveMesh): number {
   }
   return tris === 0 ? 1 : outward / tris
 }
+
+export type Profile2 = Array<[number, number]>
+
+/** An octagonal hull cross-section, chamfered at the corners. This is the
+ *  primitive that stops the ship reading as a four-sided box: real hulls meet
+ *  their faces at a bevel, and the bevel is what catches light. */
+export function octagonProfile(widthM: number, heightM: number, chamfer = 0.22): Profile2 {
+  const x = widthM / 2
+  const y = heightM / 2
+  const cx = x * (1 - chamfer)
+  const cy = y * (1 - chamfer)
+  return [
+    [cx, y],
+    [-cx, y],
+    [-x, cy],
+    [-x, -cy],
+    [-cx, -y],
+    [cx, -y],
+    [x, -cy],
+    [x, cy],
+  ]
+}
+
+/**
+ * Extrude a convex 2D profile along Z, optionally tapering the front (-Z) and
+ * back (+Z) rings independently. Cross-section is given in metres at full
+ * scale; `frontScale`/`backScale` shrink it about the Z axis.
+ */
+export function prismGeometry(
+  profile: Profile2,
+  lengthM: number,
+  frontScale = 1,
+  backScale = 1,
+): PrimitiveMesh {
+  const n = profile.length
+  const hz = lengthM / 2
+  const tris: Array<[V3, V3, V3]> = []
+
+  const ring = (scale: number, z: number): V3[] =>
+    profile.map(([x, y]) => [x * scale, y * scale, z] as V3)
+
+  const front = ring(frontScale, -hz)
+  const back = ring(backScale, hz)
+
+  // Sides. Profile is authored CCW seen from +Z; this winding faces outward.
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n
+    tris.push([front[i], back[j], back[i]])
+    tris.push([front[i], front[j], back[j]])
+  }
+  // Caps: fan triangulation (profiles are convex by contract).
+  for (let i = 1; i < n - 1; i++) {
+    tris.push([front[0], front[i + 1], front[i]])
+    tris.push([back[0], back[i], back[i + 1]])
+  }
+
+  const positions = new Float32Array(tris.length * 9)
+  const normals = new Float32Array(tris.length * 9)
+  const uvs = new Float32Array(tris.length * 6)
+
+  tris.forEach((tri, i) => {
+    const [a, b, c] = tri
+    const nrm = norm(cross(sub(b, a), sub(c, a)))
+    const verts: V3[] = [a, b, c]
+    verts.forEach((p, k) => {
+      const o = i * 9 + k * 3
+      positions[o] = p[0]
+      positions[o + 1] = p[1]
+      positions[o + 2] = p[2]
+      normals[o] = nrm[0]
+      normals[o + 1] = nrm[1]
+      normals[o + 2] = nrm[2]
+      const uo = i * 6 + k * 2
+      uvs[uo] = p[0] / Math.max(width0(profile), 1) + 0.5
+      uvs[uo + 1] = p[2] / lengthM + 0.5
+    })
+  })
+
+  return { positions, normals, uvs, triangleCount: tris.length }
+}
+
+function width0(profile: Profile2): number {
+  let w = 0
+  for (const [x] of profile) w = Math.max(w, Math.abs(x))
+  return w * 2
+}
