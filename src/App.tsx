@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { detectWebGL } from './lib/perf/webgl'
 import { FIXTURES, VESPER_SYSTEM } from './lib/world/systems'
 import { FeelSpike } from './spike/FeelSpike'
 import { LightSpike } from './spike/LightSpike'
@@ -46,9 +47,42 @@ function Nav({ current }: { current: SpikeMode }) {
   )
 }
 
+function NoWebGL({ reason }: { reason: string }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'grid',
+        placeItems: 'center',
+        padding: 32,
+        background: '#04060a',
+        color: '#e9e4d8',
+        font: '14px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace',
+      }}
+    >
+      <div style={{ maxWidth: 560 }}>
+        <div style={{ color: '#ffcf8a', letterSpacing: 1, marginBottom: 12 }}>
+          VESPER FLIGHT — CANNOT START
+        </div>
+        <p style={{ margin: '0 0 12px' }}>
+          This browser could not create a WebGL context ({reason}), so the 3D view cannot run.
+        </p>
+        <p style={{ margin: 0, color: '#8d9aa8' }}>
+          Usually that means hardware acceleration is switched off, or this is a headless/remote
+          browser. Try a current Chrome, Edge, Firefox or Safari with GPU acceleration enabled.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const params = useMemo(() => readSpikeParams(), [])
+  const gl = useMemo(() => detectWebGL(), [])
   const system = FIXTURES[params.system] ?? VESPER_SYSTEM
+
+  if (!gl.ok) return <NoWebGL reason={gl.reason ?? 'unknown'} />
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
