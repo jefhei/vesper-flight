@@ -40,11 +40,11 @@ popping, feel, night-side readability) still need Jeff in a browser — everythi
 addressable by URL (`?spike=precision|lod|feel|light`).
 
 **Machine gate:** spike verdicts recorded in `docs/spikes.md` with numbers; fixtures load and
-validate; harness runs.
+validate; harness runs. **MET.**
 **Human review:** Jeff sits in a browser for each of S1–S4 and signs off on "no jitter", "no pop",
-"feels good", "reads at night".
+"feels good", "reads at night". **MET 2026-10-22 — clean, zero sev-1, feel accepted as tuned.**
 **Exit:** the frame strategy is chosen, the LOD approach is proven or replaced, feel constants are
-recorded, and three fixture systems exist in the repo.
+recorded, and three fixture systems exist in the repo. **ALL MET — M0 CLOSED.**
 
 ## M1 — Foundation & Contracts (day 4–5)
 

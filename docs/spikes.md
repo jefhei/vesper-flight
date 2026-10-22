@@ -6,10 +6,14 @@ Run them with `npm run dev`, then open the links below.
 
 | Spike | Question | Machine result | Human verdict |
 |---|---|---|---|
-| S1 precision | Does float32 hold a 45 m hull at 1.2M km? | **PASS with rebase** — 0.000 mm at the playfield edge; without it, **57.3 m** | PENDING |
-| S2 planet LOD | Does a quad-sphere world hold up on approach? | **PASS** — 4 levels, outward winding 1.000, radial error < 0.5 m, deterministic bake | PENDING (seam artifact seen) |
-| S3 flight feel | Is assisted-Newtonian pleasant to fly? | **PASS** — step counts agree within 1 at 30/60/144 fps, assist converges < 1 m/s in 5 s, no NaN over 600 s | PENDING |
-| S4 single light | Does the ship read with one light and its own plume? | n/a (visual only) | PENDING |
+| S1 precision | Does float32 hold a 45 m hull at 1.2M km? | **PASS with rebase** — 0.000 mm at the playfield edge; without it, **57.3 m** | **PASS** — no jitter |
+| S2 planet LOD | Does a quad-sphere world hold up on approach? | **PASS** — 4 levels, outward winding 1.000, radial error < 0.5 m, deterministic bake | **PASS** — seam artifact cosmetic |
+| S3 flight feel | Is assisted-Newtonian pleasant to fly? | **PASS** — step counts agree within 1 at 30/60/144 fps, assist converges < 1 m/s in 5 s, no NaN over 600 s | **PASS** — "carries mass, speed reads" |
+| S4 single light | Does the ship read with one light and its own plume? | n/a (visual only) | **PASS** |
+
+**M0 verdict (Jeff, 2026-10-22): clean — zero sev-1, cosmetic only, feel tuning accepted as-is.**
+Exit rule met. Flight constants from S3 become the M3 starting values unchanged; the seam arc
+and skirt lip move to M4 as cosmetic defects.
 
 ---
 
