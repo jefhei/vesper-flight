@@ -62,7 +62,8 @@ recorded, and three fixture systems exist in the repo. **ALL MET — M0 CLOSED.*
 > ephemeris. That is the only reason M1 is short — it is bookkeeping, not skipped work.
 
 **Machine gate:** app boots to an empty starfield; contracts compile; validator rejects a bad spec;
-ephemeris determinism + closed-form tests pass; CI green. **MET — `npm run verify` 38 tests / 9 files.**
+ephemeris determinism + closed-form tests pass; CI green. **MET — `npm run verify` 38 tests / 9 files
+locally, and the GitHub Actions CI run on `b8bbf53` completed `success`.**
 
 ## M2 — Ship Exterior (day 6–9)
 
