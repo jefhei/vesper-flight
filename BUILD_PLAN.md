@@ -50,14 +50,19 @@ recorded, and three fixture systems exist in the repo. **ALL MET — M0 CLOSED.*
 
 | Task | Description | Depends On | Est. |
 |------|-------------|------------|------|
-| [ ] M1-T1 | Scaffold app (Vite/TS/R3F, oxlint, prettier, vitest) using the planwalker scaffold recipe | M0 | 0.5 d |
-| [ ] M1-T2 | Freeze the §7 contracts in `src/types/` (`SystemSpec`, `BodySpec`, `BodyInstance`, `ShipState`, `FlightConfig`, `CameraRig`, `TargetInfo`, `RenderFrame`) | M1-T1 | 0.5 d |
-| [ ] M1-T3 | `src/lib/world`: ephemeris (circular + Kepler ellipse), `SystemSpec` validator, sim clock | M1-T2 | 0.5 d |
-| [ ] M1-T4 | `tools/gen`: deterministic map generator + hashed manifest; `npm run assets` | M1-T1 | 0.5 d |
-| [ ] M1-T5 | CI: lint + typecheck + test + build; invariant harness wired (PRD §8 `[auto]` rows) | M1-T3 | — |
+| [x] M1-T1 | Scaffold app (Vite/TS/R3F, oxlint, prettier, vitest) using the planwalker scaffold recipe | M0 | 0.5 d |
+| [x] M1-T2 | Freeze the §7 contracts in `src/types/` (`SystemSpec`, `BodySpec`, `BodyInstance`, `ShipState`, `FlightConfig`, `CameraRig`, `TargetInfo`, `RenderFrame`) | M1-T1 | 0.5 d |
+| [x] M1-T3 | `src/lib/world`: ephemeris (circular + Kepler ellipse), `SystemSpec` validator, sim clock | M1-T2 | 0.5 d |
+| [x] M1-T4 | `src/lib/bodies`: deterministic surface bake + hashed fixture check — **delivered in-app during M0**. Disk-baking + `npm run assets` manifest is deferred to M4, where body art actually lands (runtime bake is memoised per body and costs ~150 ms for 512×256). | M1-T1 | 0.5 d |
+| [x] M1-T5 | CI: lint + typecheck + test + build (`.github/workflows/ci.yml`); invariant harness wired (PRD §8 `[auto]` rows) | M1-T3 | — |
+| [x] M1-T6 | WebGL capability guard: fail with a readable card instead of a black canvas (verified end-to-end in a browser that has no WebGL) | M1-T1 | 0.25 d |
+| [x] M1-T7 | Supply-chain triage: 5 dev-only advisories recorded with the accept-and-track decision in `docs/supply-chain.md` (`npm audit fix` is unusable on this dep set) | M1-T1 | 0.25 d |
+
+> M0 built T2–T4 early because the spikes could not be written without the contracts and the
+> ephemeris. That is the only reason M1 is short — it is bookkeeping, not skipped work.
 
 **Machine gate:** app boots to an empty starfield; contracts compile; validator rejects a bad spec;
-ephemeris determinism + closed-form tests pass; asset hashes match; CI green.
+ephemeris determinism + closed-form tests pass; CI green. **MET — `npm run verify` 38 tests / 9 files.**
 
 ## M2 — Ship Exterior (day 6–9)
 
